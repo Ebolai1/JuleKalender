@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <title>Julekalender</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      /* 🔧 Endre bakgrunn her hvis du vil */
+      background: radial-gradient(circle at top, #d82148 0%, #44000b 40%, #120009 100%);
+      color: #fff;
+    }
+
+    .calendar-wrapper {
+      max-width: 900px;
+      width: 100%;
+      background: rgba(13, 18, 30, 0.9);
+      border-radius: 24px;
+      padding: 24px 24px 28px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+    }
+
+    .calendar-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .calendar-header h1 {
+      font-size: 2rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .calendar-header p {
+      font-size: 0.95rem;
+      opacity: 0.85;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+      .calendar-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .calendar-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .day-button {
+      position: relative;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 0;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #44000b, #d82148);
+      color: #1b1b1b;
+      font-size: 1.1rem;
+      font-weight: 700;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    .day-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+      filter: brightness(1.05);
+    }
+
+    .day-button:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
+      filter: brightness(0.96);
+    }
+
+    .day-button.opened {
+      background: linear-gradient(135deg, darkblue, black);
+      color: #f5fbff;
+    }
+
+    .day-button span {
+      display: block;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .day-button::after {
+      content: "★";
+      position: absolute;
+      top: 5px;
+      right: 9px;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+
+    .day-button.opened::after {
+      content: "✓";
+      opacity: 0.7;
+    }
+
+    .message-card {
+      min-height: 80px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 16px 16px;
+      display: none;
+    }
+
+    .message-card.active {
+      display: block;
+    }
+
+    .message-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .message-content {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      opacity: 0.9;
+    }
+
+    .message-footer {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      opacity: 0.7;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px;
+
+    }
+
+      .kalender-bilde {
+        max-width: 20rem;
+        border-radius: 14px;
+        margin-top: 10px;
+        object-fit: cover;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="calendar-wrapper">
+  <div class="calendar-header">
+    <h1>Til Nora</h1>
+    <p>Elsker deg!</p>
+  </div>
+
+  <div class="calendar-grid" id="calendar-grid">
+    <!-- Knapper genereres med JavaScript -->
+  </div>
+
+  <div class="message-card" id="message-card">
+    <div class="message-title" id="message-title"></div>
+    <div class="message-content" id="message-content"></div>
+    <div class="message-footer">
+      <span id="message-day-label"></span>
+      <span>God jul 🎄</span>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+
+  // Tekster for hver dag – endre disse som du vil
+  const dayMessages = {
+    1: "1. desember Nora:) Gleder meg til å tilbringe juletiden med deg. Håper du syns denne (spesielle) julekalenderen er hyggelig!",
+    2: "2. desember: 2 Gratis kuponger for massasje, en matrett og kakao",
+    3: "3. desember: Noras topp 3 kvaliteter er: Vakker, veldig vakker og veldig veldig vakker (+ noen andre ting også da)",
+    4: "4. desember: 4 ting jeg vil gjøre med deg (familievennlig): 1. Dra på langrennstur hvor vi kan lage bål og kose oss. 2. Dra på en litt lenger kjøretur" +
+      "og oppleve noe kult! 3. Gjøre en aktivitet du brenner for. 4. Se på nordlyset sammen" ,
+    5: "5. desember: 5 ting du gjør som irriterer meg (men jeg liker det litt): 1. Tar de kalde føttene dine på meg. 2. Pauser filmen ofte. 3. Kiler og biter meg." +
+      "4. Ragebaiter. 5. Sier jeg er nerd (som ikke er sant).",
+    6: "6. desember: 'Når jeg ser deg, forelsker jeg meg igjen og igjen.'" + " – William Shakespeare",
+    7: "7. desember: 7% + 93% sikker på at jeg elsker deg",
+    8: "8. desember: Nora, få høre ditt lykkeligste minne:) Send det til meg på melding eller si det i virkeligheten.",
+    9: "9. desember: Du har lov til å slappe av, ikke stress over unødvendige ting. Jeg elsker deg 9 ganger.",
+    10: "10. desember: Aktivitet: Gå ut i snøen og lag en snømann (kall han for robert).",
+    11: "11. desember: Gi Nikolai et kompliment;) Han setter pris på det, også er det mulig du får et tilbake.",
+    12: "12. desember: Hva er det du vil gjøre i Julen Nora? Send meg melding eller si det.",
+    13: "13. desember: 13 reasons why i love you(r booty):",
+    14: "14. desember: ",
+    15: "15. desember: Pakk deg selv inn i et teppe, spis noe godt og slapp helt av",
+    16: "16. desember: ",
+    17: "17. desember: Skriv ned noe du gleder deg til fremover.",
+    18: "18. desember: Stopp, pust og tenk over alt du er takknemlig for i livet.",
+    19: "19. desember: Dette er en ganske stor gave Nora: 5 pauser til neste film vi ser.",
+    20: "20. desember: Idag vil jeg at du skal å ringe meg, si noe morsomt og legge på igjen (Jeg kommer 100% til å glemme at jeg har skrevet det her)",
+    21: "21. desember: Nå nærmer vi oss jul! Husk at du har lov til å si nei til ting du ikke vil bli med på",
+    22: "22. desember: Planlegg noe du vil gjøre for deg selv i jula",
+    23: "23. desember: God lillejulaften:) Er så utrolig glad i deg Nora!",
+    24: "24. desember: https://ebolai1.github.io/GodJulNora/ Åpne den på pcen din:)"
+  };
+
+  const grid = document.getElementById("calendar-grid");
+  const messageCard = document.getElementById("message-card");
+  const messageTitle = document.getElementById("message-title");
+  const messageContent = document.getElementById("message-content");
+  const messageDayLabel = document.getElementById("message-day-label");
+
+  dayMessages[14] = `
+  <p>14. desember: Du er gave nok for meg.</p>
+  <img src="JuleMeme.webp" class="kalender-bilde">
+`;
+
+  dayMessages[16] = `
+  <p>16. desember: Syns ikke du har hørt det nok, så ville bare si at du er søt og kul.</p>
+  <img src="JuleMeme2.gif" class="kalender-bilde">
+`;
+
+  dayMessages[20] = `
+  <p>20. desember: Vi må ta noen hyggelige bilder til jul. </p>
+  <img src="JuleMeme3.jpg" class="kalender-bilde">
+`;
+
+  // Lage knappene 1–24
+  for (let day = 1; day <= 24; day++) {
+    const btn = document.createElement("button");
+    btn.className = "day-button";
+    btn.dataset.day = day;
+    btn.innerHTML = `<span>${day}</span>`;
+    btn.addEventListener("click", () => openDoor(day, btn));
+    grid.appendChild(btn);
+  }
+
+  function openDoor(day, buttonEl) {
+    const text = dayMessages[day] || "Ingen tekst satt for denne dagen enda.";
+    messageTitle.textContent = `Luke ${day}`;
+    messageContent.innerHTML = text;
+    messageCard.classList.add("active");
+
+    // Marker at denne dagen er åpnet
+    buttonEl.classList.add("opened");
+  }
+</script>
+</body>
+</html>
